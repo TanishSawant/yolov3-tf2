@@ -56,7 +56,9 @@ run_with_ngrok(app)
 def get_detections():
 
     #call Neel
-    url = "neel ka url"
+    url = "localhost:8080"
+
+
     response_url = requests.post(url, {"service":"camera"}) #considering response is the url
     urllib.request.urlretrieve(response_url, 'image.jpg')
     #
@@ -129,7 +131,7 @@ def gello():
 def get_image():
 
     #call Neel
-    url = "neel ka url"
+    url = "localhost:8080"
     response = requests.post(url, {"service":"camera"}) #considering response is the url
     urllib.request.urlretrieve(response, 'image.jpg')
     #

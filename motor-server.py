@@ -6,10 +6,10 @@ import requests
 import json
 import base64
 from flask import request
-from flask_ngrok import run_with_ngrok
+# from flask_ngrok import run_with_ngrok
 
 app = Flask(__name__)
-run_with_ngrok(app)
+# run_with_ngrok(app)
 
 @app.route('/',  methods=['POST'])
 def workflow():
@@ -61,4 +61,4 @@ def workflow():
     return "None"
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=8080)
