@@ -10,6 +10,7 @@ from yolov3_tf2.dataset import transform_images, load_tfrecord_dataset
 from yolov3_tf2.utils import draw_outputs
 from flask import Flask, request, Response, jsonify, send_from_directory, abort
 import os
+from flask_ngrok import run_with_ngrok
 
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
@@ -46,7 +47,7 @@ print('classes loaded')
 
 # Initialize Flask application
 app = Flask(__name__)
-
+run_with_ngrok(app)
 # API that returns JSON with classes found in images
 @app.route('/detections', methods=['POST'])
 def get_detections():
@@ -151,4 +152,4 @@ def get_image():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host = 'localhost', port=5000)
+    app.run()
