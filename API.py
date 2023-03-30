@@ -11,6 +11,15 @@ from yolov3_tf2.utils import draw_outputs
 from flask import Flask, request, Response, jsonify, send_from_directory, abort
 import os
 
+from cloudinary.uploader import upload
+from cloudinary.utils import cloudinary_url
+cloudinary.config(
+  cloud_name = "dgyqb1z2g",
+  api_key = "545892885457815",
+  api_secret = "dc4jz6zhdoTsN97FFsYw6FR5qfc",
+  secure = true
+)
+
 # # customize your API through the following parameters
 classes_path = './data/strawberry.names'
 weights_path = './checkpoints/yolov3_train_10.tf'
@@ -125,16 +134,18 @@ def get_image():
     img = draw_outputs(img, (boxes, scores, classes, nums), class_names)
     cv2.imwrite(output_path + 'detection.jpg', img)
     print('output saved to: {}'.format(output_path + 'detection.jpg'))
+    upload(output_path + 'detection.jpg', public_id="image")
+    url, options = cloudinary_url("image", width=100, height=150, crop="fill")
     
     # prepare image for response
-    _, img_encoded = cv2.imencode('.png', img)
-    response = img_encoded.tobytes()
+    # _, img_encoded = cv2.imencode('.png', img)
+    # response = img_encoded.tobytes()
     
     #remove temporary image
     os.remove(image_name)
 
     try:
-        return Response(response=response, status=200, mimetype='image/png')
+        return Response(response=url, status=200)
     except FileNotFoundError:
         abort(404)
 
