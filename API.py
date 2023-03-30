@@ -145,7 +145,7 @@ def get_image():
     os.remove(image_name)
 
     try:
-        return Response(response=url, status=200)
+        return jsonify({"response" : url}), 200
     except FileNotFoundError:
         abort(404)
 
