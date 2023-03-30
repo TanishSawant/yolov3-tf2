@@ -6,6 +6,7 @@ import tensorflow as tf
 from yolov3_tf2.models import (
     YoloV3, YoloV3Tiny
 )
+import jsonify
 from yolov3_tf2.dataset import transform_images, load_tfrecord_dataset
 from yolov3_tf2.utils import draw_outputs
 from flask import Flask, request, Response, jsonify, send_from_directory, abort
@@ -14,11 +15,13 @@ from flask_ngrok import run_with_ngrok
 
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
+import cloudinary
+
 cloudinary.config(
   cloud_name = "dgyqb1z2g",
   api_key = "545892885457815",
   api_secret = "dc4jz6zhdoTsN97FFsYw6FR5qfc",
-  secure = true
+  secure = True
 )
 
 # # customize your API through the following parameters
@@ -137,7 +140,7 @@ def get_image():
     print('output saved to: {}'.format(output_path + 'detection.jpg'))
     upload(output_path + 'detection.jpg', public_id="image")
     url, options = cloudinary_url("image", width=100, height=150, crop="fill")
-    
+    print(url)
     # prepare image for response
     # _, img_encoded = cv2.imencode('.png', img)
     # response = img_encoded.tobytes()
@@ -146,7 +149,7 @@ def get_image():
     os.remove(image_name)
 
     try:
-        return Response(response=url, status=200)
+        return jsonify({"Response": url}), 200
     except FileNotFoundError:
         abort(404)
 
