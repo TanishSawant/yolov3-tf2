@@ -6,7 +6,7 @@ import tensorflow as tf
 from yolov3_tf2.models import (
     YoloV3, YoloV3Tiny
 )
-import jsonify
+from flask import jsonify
 from yolov3_tf2.dataset import transform_images, load_tfrecord_dataset
 from yolov3_tf2.utils import draw_outputs
 from flask import Flask, request, Response, jsonify, send_from_directory, abort
@@ -139,7 +139,7 @@ def get_image():
     cv2.imwrite(output_path + 'detection.jpg', img)
     print('output saved to: {}'.format(output_path + 'detection.jpg'))
     upload(output_path + 'detection.jpg', public_id="image")
-    url, options = cloudinary_url("image", width=100, height=150, crop="fill")
+    url, options = cloudinary_url("image", crop="fill")
     print(url)
     # prepare image for response
     # _, img_encoded = cv2.imencode('.png', img)
