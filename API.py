@@ -16,6 +16,9 @@ from flask_ngrok import run_with_ngrok
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
 import cloudinary
+import requests
+import urllib
+from PIL import Image
 
 cloudinary.config(
   cloud_name = "dgyqb1z2g",
@@ -50,17 +53,18 @@ print('classes loaded')
 
 # Initialize Flask application
 app = Flask(__name__)
-run_with_ngrok(app)
+# run_with_ngrok(app)
 # API that returns JSON with classes found in images
 @app.route('/detections', methods=['GET'])
 def get_detections():
 
     #call Neel
-    url = "localhost:8080"
+    url = "http://127.0.0.1:8080/"
 
 
-    response_url = requests.post(url, {"service":"camera"}) #considering response is the url
-    urllib.request.urlretrieve(response_url, 'image.jpg')
+    response_url = requests.post(url, json={"service":"camera"}) #considering response is the url
+    print(response_url.text)
+    urllib.request.urlretrieve(response_url.text, 'image.jpg')
     #
     raw_images = []
 
@@ -117,7 +121,7 @@ def get_detections():
     for name in image_names:
         os.remove(name)
     try:
-        return jsonify({"response":response, "cameraImage" : response_url}), 200
+        return jsonify({"response":response, "cameraImage" : response_url.text}), 200
     except FileNotFoundError:
         abort(404)
 
@@ -131,9 +135,9 @@ def gello():
 def get_image():
 
     #call Neel
-    url = "localhost:8080"
-    response = requests.post(url, {"service":"camera"}) #considering response is the url
-    urllib.request.urlretrieve(response, 'image.jpg')
+    url = "http://127.0.0.1:8080/"
+    response = requests.post(url, json={"service":"camera"}) #considering response is the url
+    urllib.request.urlretrieve(response.text, 'image.jpg')
     #
     image_name = 'image.jpg'
     # image = request.files["images"]
@@ -175,4 +179,4 @@ def get_image():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
