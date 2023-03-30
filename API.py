@@ -52,19 +52,29 @@ print('classes loaded')
 app = Flask(__name__)
 run_with_ngrok(app)
 # API that returns JSON with classes found in images
-@app.route('/detections', methods=['POST'])
+@app.route('/detections', methods=['GET'])
 def get_detections():
+
+    #call Neel
+    url = "neel ka url"
+    response_url = requests.post(url, {"service":"camera"}) #considering response is the url
+    urllib.request.urlretrieve(response_url, 'image.jpg')
+    #
     raw_images = []
-    images = request.files.getlist("images")
-    image_names = []
-    for image in images:
-        image_name = image.filename
-        image_names.append(image_name)
-        image.save(os.path.join(os.getcwd(), image_name))
-        img_raw = tf.image.decode_image(
-            open(image_name, 'rb').read(), channels=3)
-        raw_images.append(img_raw)
-        
+
+    img_raw = tf.image.decode_image(open('image.jpg', 'rb').read(), channels=3)
+    raw_images.append(img_raw)
+    image_names = ['image.jpg',]
+
+    #images = request.files.getlist("images")
+    
+    # for image in images:
+    #     image_name = image.filename
+    #     image_names.append(image_name)
+    #     image.save(os.path.join(os.getcwd(), image_name))
+    #     img_raw = tf.image.decode_image(
+    #         open(image_name, 'rb').read(), channels=3)
+    #     raw_images.append(img_raw)
     num = 0
     
     # create list for final response
@@ -105,20 +115,28 @@ def get_detections():
     for name in image_names:
         os.remove(name)
     try:
-        return jsonify({"response":response}), 200
+        return jsonify({"response":response, "cameraImage" : response_url}), 200
     except FileNotFoundError:
         abort(404)
+
 
 @app.route("/", methods=["GET"])
 def gello():
     return({"mst":"wfu"})
 
 # API that returns image with detections on it
-@app.route('/image', methods= ['POST'])
+@app.route('/image', methods= ['GET'])
 def get_image():
-    image = request.files["images"]
-    image_name = image.filename
-    image.save(os.path.join(os.getcwd(), image_name))
+
+    #call Neel
+    url = "neel ka url"
+    response = requests.post(url, {"service":"camera"}) #considering response is the url
+    urllib.request.urlretrieve(response, 'image.jpg')
+    #
+    image_name = 'image.jpg'
+    # image = request.files["images"]
+    # image_name = image.filename
+    # image.save(os.path.join(os.getcwd(), image_name))
     img_raw = tf.image.decode_image(
         open(image_name, 'rb').read(), channels=3)
     img = tf.expand_dims(img_raw, 0)
@@ -140,7 +158,7 @@ def get_image():
     print('output saved to: {}'.format(output_path + 'detection.jpg'))
     upload(output_path + 'detection.jpg', public_id="image")
     url, options = cloudinary_url("image", crop="fill")
-    print(url)
+    
     # prepare image for response
     # _, img_encoded = cv2.imencode('.png', img)
     # response = img_encoded.tobytes()
@@ -149,7 +167,7 @@ def get_image():
     os.remove(image_name)
 
     try:
-        return jsonify({"Response": url}), 200
+        return jsonify({"response" : url}), 200
     except FileNotFoundError:
         abort(404)
 
