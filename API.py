@@ -19,6 +19,13 @@ import cloudinary
 import requests
 import urllib
 from PIL import Image
+import numpy as np
+import pyimgur
+
+imgur_client_id = '2eadeec4f0227cf'
+imgur_client = pyimgur.Imgur(imgur_client_id)
+
+
 
 cloudinary.config(
   cloud_name = "dgyqb1z2g",
@@ -29,11 +36,11 @@ cloudinary.config(
 
 # # customize your API through the following parameters
 classes_path = './data/strawberry.names'
-weights_path = './checkpoints/yolov3_train_10.tf'
+weights_path = '/home/tanish/Desktop/Dev/ML/yolov3-tf2/checkpoints/yolov3_train_20.tf'
 tiny = False                    # set to True if using a Yolov3 Tiny model
 size = 416                      # size images are resized to for model
 output_path = './detections/'   # path to output folder where images with detections are saved
-num_classes = 20                # number of classes in model
+num_classes = 2             # number of classes in model
 
 # # load in weights and classes
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
@@ -53,13 +60,13 @@ print('classes loaded')
 
 # Initialize Flask application
 app = Flask(__name__)
-run_with_ngrok(app)
+# run_with_ngrok(app)
 # API that returns JSON with classes found in images
 @app.route('/detections', methods=['GET'])
 def get_detections():
 
     #call Neel
-    url = "http://127.0.0.1:8080/"
+    url = "http://127.0.0.1:8081/"
 
 
     response_url = requests.post(url, json={"service":"camera"}) #considering response is the url
@@ -101,15 +108,15 @@ def get_detections():
 
         print('detections:')
         for i in range(nums[0]):
-            print('\t{}, {}, {}'.format(class_names[int(classes[0][i])],
-                                            np.array(scores[0][i]),
-                                            np.array(boxes[0][i])))
-            responses.append({
-                "class": class_names[int(classes[0][i])],
-                "confidence": float("{0:.2f}".format(np.array(scores[0][i])*100))
-            })
+            # print('\t{}, {}, {}'.format(class_names[int(classes[0][i])],
+            #                                 np.array(scores[0][i]),
+            #                                 np.array(boxes[0][i])))
+            responses.append([
+                class_names[int(classes[0][i])], float("{0:.2f}".format(np.array(scores[0][i])*100))
+            ])
+
+        # print(responses)
         response.append({
-            "image": image_names[j],
             "detections": responses
         })
         img = cv2.cvtColor(raw_img.numpy(), cv2.COLOR_RGB2BGR)
@@ -120,7 +127,10 @@ def get_detections():
     #remove temporary images
     for name in image_names:
         os.remove(name)
+    print("=============================")
+    print(response)
     try:
+
         return jsonify({"response":response, "cameraImage" : response_url.text}), 200
     except FileNotFoundError:
         abort(404)
@@ -135,7 +145,8 @@ def gello():
 def get_image():
 
     #call Neel
-    url = "http://127.0.0.1:8080/"
+    # url = "https://056d-42-106-240-194.in.ngrok.io/"
+    url = 'http://localhost:8081/'
     response = requests.post(url, json={"service":"camera"}) #considering response is the url
     urllib.request.urlretrieve(response.text, 'image.jpg')
     #
@@ -162,8 +173,13 @@ def get_image():
     img = draw_outputs(img, (boxes, scores, classes, nums), class_names)
     cv2.imwrite(output_path + 'detection.jpg', img)
     print('output saved to: {}'.format(output_path + 'detection.jpg'))
-    upload(output_path + 'detection.jpg', public_id="image")
-    url, options = cloudinary_url("image", crop="fill")
+    # upload(output_path + 'detection.jpg', public_id="image", overwrite=True)
+    # url, options = cloudinary_url("image", crop="fill")
+    # image_path = output_path + "detection.jpg"
+    # print(url)
+    uploaded_image = imgur_client.upload_image(output_path + 'detection.jpg') 
+    print(uploaded_image.link)
+    img_url = uploaded_image.link
     
     # prepare image for response
     # _, img_encoded = cv2.imencode('.png', img)
@@ -173,10 +189,10 @@ def get_image():
     os.remove(image_name)
 
     try:
-        return jsonify({"response" : url}), 200
+        return jsonify({"response" : img_url}), 200
     except FileNotFoundError:
         abort(404)
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
