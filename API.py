@@ -20,7 +20,8 @@ import requests
 import urllib
 from PIL import Image
 import numpy as np
-import pyimgur
+import pyimgur, json
+from helper import getPrice
 
 imgur_client_id = '2eadeec4f0227cf'
 imgur_client = pyimgur.Imgur(imgur_client_id)
@@ -111,9 +112,10 @@ def get_detections():
             # print('\t{}, {}, {}'.format(class_names[int(classes[0][i])],
             #                                 np.array(scores[0][i]),
             #                                 np.array(boxes[0][i])))
-            responses.append([
-                class_names[int(classes[0][i])], float("{0:.2f}".format(np.array(scores[0][i])*100))
-            ])
+            _score = float("{0:.2f}".format(np.array(scores[0][i])*100))
+            responses.append({
+                "class" : class_names[int(classes[0][i])], "score" : _score, "price" : getPrice(_score)
+            })
 
         # print(responses)
         response = responses
