@@ -19,7 +19,7 @@ def workflow():
     val = req["service"]
     print(val)
     if val == "camera":  
-        return "https://i.imgur.com/lT14jJC.jpg"
+        return "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc6suNIEDzltv1RPCswWRBJJ8394kdx6lfdg&usqp=CAU"
 
     if val == "footage":
         return "https://i.imgur.com/lT14jJC.jpg"
@@ -63,4 +63,4 @@ def workflow():
     return "None"
 
 if __name__ == "__main__":
-    app.run(port=8081)
+    app.run(port=8081, debug=True)
