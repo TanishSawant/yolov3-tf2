@@ -122,7 +122,7 @@ def get_detections():
             elif int(classes[0][i] == 0) and float("{0:.2f}".format(np.array(scores[0][i])*100)) < 50.0:
                 _score = pxx.uniform(0.6, 0.93)
             else:
-                _score = float("{0:.2f}".format(np.array(scores[0][i])*100))
+                _score = float("{0:.2f}".format(np.array(scores[0][i])))
 
             wh = np.flip(raw_img.shape[0:2])
             print("Detection label")
@@ -181,7 +181,7 @@ def get_image():
                                         np.array(scores[0][i]),
                                         np.array(boxes[0][i])))
     img = cv2.cvtColor(img_raw.numpy(), cv2.COLOR_RGB2BGR)
-    img = draw_outputs(img, (boxes, scores, classes, nums), class_names)
+    img, _ = draw_outputs(img, (boxes, scores, classes, nums), class_names)
     cv2.imwrite(output_path + 'detection.jpg', img)
     print('output saved to: {}'.format(output_path + 'detection.jpg'))
     # upload(output_path + 'detection.jpg', public_id="image", overwrite=True)
@@ -206,4 +206,4 @@ def get_image():
 
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run()
