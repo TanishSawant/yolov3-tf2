@@ -62,7 +62,7 @@ print('classes loaded')
 
 # Initialize Flask application
 app = Flask(__name__)
-# run_with_ngrok(app)
+run_with_ngrok(app)
 # API that returns JSON with classes found in images
 @app.route('/detections', methods=['GET'])
 def get_detections():
