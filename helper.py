@@ -1,9 +1,9 @@
 def getPrice(ripeness):
     if ripeness >=0 and ripeness <= 25:
-        return "Rs. 30 - 40 /kg"
+        return "Rs. 30 - 35 /kg"
     elif ripeness >= 25 and ripeness <=50:
-        return "Rs. 55 - 65 /kg"
+        return "Rs. 40 - 43 /kg"
     elif ripeness >= 50 and ripeness <=75:
-        return "Rs.  65 - 70 /kg"
+        return "Rs.  53 - 60 /kg"
     else:
-        return "Rs 75 - 100 /kg"
+        return "Rs 63 - 70 /kg"
