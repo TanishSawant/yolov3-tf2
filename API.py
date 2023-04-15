@@ -116,22 +116,20 @@ def get_detections():
             ])
 
         # print(responses)
-        response.append({
-            "detections": responses
-        })
+        response = responses
         img = cv2.cvtColor(raw_img.numpy(), cv2.COLOR_RGB2BGR)
         img = draw_outputs(img, (boxes, scores, classes, nums), class_names)
         cv2.imwrite(output_path + 'detection' + str(num) + '.jpg', img)
         print('output saved to: {}'.format(output_path + 'detection' + str(num) + '.jpg'))
-
+    print("Shit")
     #remove temporary images
     for name in image_names:
         os.remove(name)
     print("=============================")
-    print(response)
+    print(responses)
     try:
 
-        return jsonify({"response":response, "cameraImage" : response_url.text}), 200
+        return jsonify(response), 200
     except FileNotFoundError:
         abort(404)
 
@@ -195,4 +193,4 @@ def get_image():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug = True)
