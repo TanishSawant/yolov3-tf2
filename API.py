@@ -114,7 +114,7 @@ def get_detections():
             #                                 np.array(boxes[0][i])))
             _score = float("{0:.2f}".format(np.array(scores[0][i])*100))
             responses.append({
-                "class" : class_names[int(classes[0][i])], "score" : _score, "price" : getPrice(_score)
+                "status" : class_names[int(classes[0][i])], "score" : _score, "price" : getPrice(_score)
             })
 
         # print(responses)
